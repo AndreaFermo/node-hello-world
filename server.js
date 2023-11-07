@@ -19,15 +19,29 @@ const frasiMotivazionali = [
     "Ogni giorno è una nuova opportunità per essere migliore."
 ];
 
+const indiciFrasiUsate = [];
 
 function htmlResponse(res, content) {
-    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }); //charset serve per formattare il testo
     res.end(content);
 };
 
 const server = http.createServer(function (req, res) {
-    const frase = fraseCasuale(frasiMotivazionali);
-    htmlResponse(res, `<h1>${frase}</h1>`);
+    // console.log(req.url);
+    if (req.url === '/favicon.ico') res.writeHead(404).end(); // se si utilizza chrome dà problemi la richiesta anche dell'icona quindi la andiamo ad intercettare 
+
+    if (indiciFrasiUsate.length < frasiMotivazionali.length) {
+        let index = indiceCasuale(frasiMotivazionali);
+        console.log(indiciFrasiUsate);
+        while (indiciFrasiUsate.includes(index)) {
+            index = indiceCasuale(frasiMotivazionali);
+        }
+        indiciFrasiUsate.push(index);
+        htmlResponse(res, `<h1>${frasiMotivazionali[index]}</h1>`);
+    } else {
+        htmlResponse(res, `<h1>Le frasi sono finite!</h1>`);
+    }
+
 });
 
 server.listen(port, function () {
@@ -35,7 +49,11 @@ server.listen(port, function () {
 });
 
 
-function fraseCasuale(array) {
+function indiceCasuale(array) {
     const randomIndex = Math.floor(Math.random() * array.length);
-    return array[randomIndex];
+    return randomIndex;
 };
+
+
+
+
